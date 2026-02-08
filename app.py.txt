@@ -1,0 +1,47 @@
+import streamlit as st
+from web3 import Web3
+import time
+
+# Monad public RPC endpoint
+RPC_URL = "https://rpc.ankr.com/monad"
+w3 = Web3(Web3.HTTPProvider(RPC_URL))
+
+# Your contracts
+contracts = {
+    "AgentFactory": "0x4763F996547F54BC6eA834746B9fe4d250FabEBA",
+    "AiCoinflipMON": "0xf01dfcA848a37B76025fc416d2b681c5aa057544",
+    "AiGuardPrison": "0x6Ac2752De7eD1E8C62A08FC6f722be34a242Df1D"
+}
+
+st.set_page_config(page_title="Monad AI Projects Dashboard", page_icon="🔗", layout="wide")
+st.title("🔗 Live Dashboard: Monad AI Projects")
+st.markdown("Real-time MON balances and contract status. Refreshes every 10s. Data from Monad mainnet.")
+
+# Status check
+if not w3.is_connected():
+    st.error("❌ Unable to connect to Monad RPC. Check network status.")
+    st.stop()
+
+# Dashboard layout
+for name, address in contracts.items():
+    col1, col2 = st.columns([3, 1])
+    with col1:
+        st.subheader(f"**{name}**")
+        st.code(address)
+        
+        # Live balance
+        balance_wei = w3.eth.get_balance(address)
+        balance_mon = w3.from_wei(balance_wei, "ether")
+        st.metric("MON Balance", f"{balance_mon:,.4f}", delta=None)
+        
+        # Contract deployment check
+        code = w3.eth.get_code(address)
+        deployed = len(code) > 0
+        st.success("✅ Contract Deployed" if deployed else "❌ No Code")
+    
+    with col2:
+        st.markdown(f"[View on Monadscan](https://monadscan.com/address/{address})")
+
+# Auto-refresh
+time.sleep(10)
+st.rerun()
