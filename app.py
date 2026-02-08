@@ -3,7 +3,7 @@ from web3 import Web3
 import time
 
 # Monad public RPC endpoint
-RPC_URL = "https://rpc.ankr.com/monad"
+RPC_URL = "https://monad-mainnet.gateway.tatum.io"
 w3 = Web3(Web3.HTTPProvider(RPC_URL))
 
 # Your contracts
@@ -45,3 +45,4 @@ for name, address in contracts.items():
 # Auto-refresh
 time.sleep(10)
 st.rerun()
+
